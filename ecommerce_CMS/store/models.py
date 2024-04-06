@@ -17,12 +17,22 @@ class Category(models.Model):
 
 class Product(models.Model):
 
-    user = models.ForeignKey(User, related_name="products", on_delete=models.CASCADE)
+    DRAFT = "draft"
+    WAITING_APPROVAL = "waitingapproval"
+    ACTIVE = "active"
+    DELETED = "deleted"
 
+    STATUS_CHOICES = (
+        (DRAFT, "Draft"),
+        (WAITING_APPROVAL, "Waiting Approval"),
+        (ACTIVE, "Active"),
+        (DELETED, "Deleted"),
+    )
+
+    user = models.ForeignKey(User, related_name="products", on_delete=models.CASCADE)
     category = models.ForeignKey(
         Category, related_name="products", on_delete=models.CASCADE
     )
-
     title = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)
     description = models.TextField(blank=True)
@@ -32,6 +42,7 @@ class Product(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=ACTIVE)
 
     class Meta:
         ordering = ("-created_at",)
