@@ -1,7 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import *
 from django.db.models import Q
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+ 
+from .models import *
 from .cart import Cart
+from .forms import OrderForm
+
 
 # Create your views here.
 
@@ -42,6 +47,57 @@ def cart_view(request):
         "store/cart_view.html",
         {
             "cart": cart,
+        },
+    )
+
+
+# wselt ll partie 8
+
+
+@login_required
+def checkout(request):
+    cart = Cart(request)
+
+    # bech ki yebda l panier fera8 ma yod5olch ll checkout
+    if cart.get_total_cost() == 0:
+        return redirect("cart_view")
+
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            totla_price = 0
+
+            for item in cart:
+                product = item["product"]
+                totla_price += product.price * item["quantity"]
+
+            order = form.save(commit=False)
+            order.created_by = request.user
+            order.paid_amount = totla_price
+            order.save()
+
+            for item in cart:
+                product = item["product"]
+                quantity = int(item["quantity"])
+                price = product.price * quantity
+                item = OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    price=price,
+                    quantity=quantity,
+                )
+
+                cart.clear()
+
+            return redirect("myaccount")
+    else:
+        form = OrderForm()
+    return render(
+        request,
+        "store/checkout.html",
+        {
+            "cart": cart,
+            "form": form,
         },
     )
 

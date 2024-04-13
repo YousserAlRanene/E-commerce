@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+  checkout
+{% endblock %}
+
+{% block content %}
+  <h1 class="mb-6 text-2xl">checkout</h1>
+  <h2>Total cost : ${{ cart.get_total_cost }}</h2>
+
+  <form action="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button href="{% url 'checkout' %}" class="inline-block px-8 py-4 bg-teal-500 text-white" onclick="buy(event)">checkout</button>
+  </form>
+{% endblock %}

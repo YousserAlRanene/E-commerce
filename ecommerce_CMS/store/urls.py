@@ -29,6 +29,11 @@ urlpatterns = [
         name="cart_view",
     ),
     path(
+        "cart/checkout/",
+        views.checkout,
+        name="checkout",
+    ),
+    path(
         "<slug:slug>/",
         views.category_detail,
         name="category_detail",
